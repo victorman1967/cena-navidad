@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1f1a">
+  <meta name="description" content="Cena de Navidad 2026 - Valverde y La Granadilla. Cuenta atrás, gincana, muro de deseos y mucho más.">
+  <title>Cena de Navidad 2026 · Valverde &amp; La Granadilla</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lilita+One&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="snow" id="snow" aria-hidden="true"></div>
+
+  <header class="site-header" id="siteHeader">
+    <a class="brand" href="#inicio" aria-label="Ir al inicio">
+      <span class="brand-icon">🎄</span>
+      <span class="brand-text">Cena de Navidad<small class="palabras-navidad">Valverde &amp; La Granadilla</small></span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="site-nav" id="siteNav" aria-label="Navegación principal">
+      <a href="#inicio">Inicio</a>
+      <a href="#organizadores">Organizadores</a>
+      <a href="#fotos">Calentando motores</a>
+      <a href="#mapa">Cómo llegar</a>
+      <a href="#muro">Muro de deseos</a>
+      <a href="#gincana" class="nav-cta">Gincana 🎁</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-lights" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <div class="hero-side hero-side-left" aria-hidden="true">
+          <div class="disco-wrap">
+            <div class="disco-beam beam-1"></div>
+            <div class="disco-beam beam-2"></div>
+            <div class="disco-beam beam-3"></div>
+            <div class="disco-ball"><div class="disco-shine"></div></div>
+            <div class="disco-cord"></div>
+          </div>
+        </div>
+
+        <div class="hero-center">
+          <p class="hero-kicker">✦ Una noche para recordar ✦</p>
+          <h1 class="hero-title">CENA DE<br><span>NAVIDAD</span></h1>
+          <p class="hero-subtitle">5 de diciembre de 2026 · 23:00 h<br>Gran Hotel Casino Extremadura · Badajoz</p>
+
+          <div class="marquee" aria-label="Valverde y La Granadilla">
+            <div class="marquee-track">
+              <span class="palabras-navidad">VALVERDE <i>✦</i> LA GRANADILLA <i>✦</i> VALVERDE <i>✦</i> LA GRANADILLA <i>✦</i></span>
+              <span class="palabras-navidad" aria-hidden="true">VALVERDE <i>✦</i> LA GRANADILLA <i>✦</i> VALVERDE <i>✦</i> LA GRANADILLA <i>✦</i></span>
+            </div>
+          </div>
+
+          <div class="countdown" id="countdown" aria-live="polite">
+            <div class="time-box"><strong id="cdDays">--</strong><span>días</span></div>
+            <div class="time-box"><strong id="cdHours">--</strong><span>horas</span></div>
+            <div class="time-box"><strong id="cdMinutes">--</strong><span>minutos</span></div>
+            <div class="time-box"><strong id="cdSeconds">--</strong><span>segundos</span></div>
+          </div>
+          <p class="countdown-label" id="countdownLabel">¡Faltan poquísimo para brindar juntos!</p>
+
+          <div class="hero-actions">
+            <a href="#gincana" class="btn btn-primary">🎁 Participar en la gincana</a>
+            <a href="#muro" class="btn btn-ghost">✍️ Dejar un deseo</a>
+          </div>
+        </div>
+
+        <div class="hero-side hero-side-right" aria-hidden="true">
+          <svg class="tree" viewBox="0 0 240 300" role="img">
+            <ellipse cx="120" cy="281" rx="82" ry="11" fill="rgba(0,0,0,.35)"/>
+            <rect x="107" y="238" width="26" height="42" rx="5" fill="#8b5a2b"/>
+            <path d="M120 12 L72 100 H98 L60 164 H92 L44 232 H196 L148 164 H180 L142 100 H168 Z" fill="#0f6b45"/>
+            <path d="M120 12 L72 100 H98 L60 164 H92 L44 232 H120 Z" fill="#0b5737" opacity=".55"/>
+            <g class="tree-lights">
+              <circle class="bombilla" cx="120" cy="34" r="5" fill="#ffd54a"/>
+              <circle class="bombilla" cx="90" cy="78" r="5" fill="#ff5c6c"/>
+              <circle class="bombilla" cx="146" cy="88" r="5" fill="#64e6ff"/>
+              <circle class="bombilla" cx="110" cy="120" r="5" fill="#ffd54a"/>
+              <circle class="bombilla" cx="165" cy="138" r="5" fill="#ff5c6c"/>
+              <circle class="bombilla" cx="72" cy="150" r="5" fill="#64e6ff"/>
+              <circle class="bombilla" cx="128" cy="180" r="5" fill="#ffd54a"/>
+              <circle class="bombilla" cx="96" cy="205" r="5" fill="#ff5c6c"/>
+              <circle class="bombilla" cx="158" cy="212" r="5" fill="#64e6ff"/>
+              <circle class="bombilla" cx="120" cy="242" r="5" fill="#ffd54a"/>
+              <circle class="bombilla" cx="66" cy="226" r="5" fill="#ff5c6c"/>
+              <circle class="bombilla" cx="184" cy="226" r="5" fill="#64e6ff"/>
+            </g>
+            <path class="garland" d="M84 108 Q120 130 156 108" fill="none" stroke="#f6d365" stroke-width="3"/>
+            <path class="garland" d="M70 168 Q120 196 170 168" fill="none" stroke="#f6d365" stroke-width="3"/>
+            <path class="garland" d="M54 226 Q120 258 186 226" fill="none" stroke="#f6d365" stroke-width="3"/>
+            <polygon points="120,4 114,18 126,18" fill="#ffd54a" class="star-top"/>
+          </svg>
+        </div>
+      </div>
+      <a class="scroll-hint" href="#organizadores" aria-label="Desplazarse a organizadores"><span></span>Desliza para descubrir</a>
+    </section>
+
+    <section class="section intro-section" id="detalles">
+      <div class="container">
+        <p class="section-kicker">La cita del año</p>
+        <h2 class="section-title">Una noche, <em>mil momentos</em></h2>
+        <div class="info-grid">
+          <article class="info-card"><span class="info-icon">📅</span><h3>Cuándo</h3><p>Sábado 5 de diciembre de 2026<br><strong>23:00 h</strong> · cena hasta tarde</p></article>
+          <article class="info-card"><span class="info-icon">📍</span><h3>Dónde</h3><p>Gran Hotel Casino Extremadura<br>Av. Adolfo Díaz Ambrona, 11 · Badajoz</p></article>
+          <article class="info-card"><span class="info-icon">🥂</span><h3>Quiénes</h3><p><span class="palabras-navidad">Valverde &amp; La Granadilla</span><br>Familia, amigos y gente de bien</p></article>
+          <article class="info-card"><span class="info-icon">🎁</span><h3>Extra</h3><p>Gincana con 8 QR, premios para el top 3 y muro de deseos</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section organizadores-section" id="organizadores">
+      <div class="container">
+        <p class="section-kicker">Los que han hecho posible la magia</p>
+        <h2 class="section-title">Nuestros <em>organizadores</em></h2>
+        <p class="section-lead">Ellos son los mandos. Novatos, pero imprescindibles: cada uno ha puesto su granito de arena (y alguna que otra risa).</p>
+        <div class="organizers-grid">
+          <article class="org-card">
+            <div class="org-avatar"><img src="assets/img/mando1.svg" alt="Caricatura de El Comandante"></div>
+            <p class="org-mote">El Comandante</p><h3>Director General</h3>
+            <p>Manda, decide y hace que todo cuadre. Su frase: <em>«¡A la orden!»</em></p>
+            <span class="org-stars">★★★★★</span>
+          </article>
+          <article class="org-card">
+            <div class="org-avatar"><img src="assets/img/mando2.svg" alt="Caricatura de La Intendenta"></div>
+            <p class="org-mote">La Intendenta</p><h3>Jefa de Logística</h3>
+            <p>Sabe dónde está hasta el último servilleta. Sufre en silencio por nosotros.</p>
+            <span class="org-stars">★★★★★</span>
+          </article>
+          <article class="org-card">
+            <div class="org-avatar"><img src="assets/img/mando3.svg" alt="Caricatura de Capitán Brindis"></div>
+            <p class="org-mote">Capitán Brindis</p><h3>Jefe de Protocolo</h3>
+            <p>Encargado de que ninguna copa esté vacía y de que nadie falte a la foto.</p>
+            <span class="org-stars">★★★★★</span>
+          </article>
+          <article class="org-card">
+            <div class="org-avatar"><img src="assets/img/mando4.svg" alt="Caricatura de La Maestra"></div>
+            <p class="org-mote">La Maestra</p><h3>Guardiana de la Gincana</h3>
+            <p>Diseñó los 8QR y esconde las pistas mejor que nadie. Cuidado con ella.</p>
+            <span class="org-stars">★★★★★</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section fotos-section" id="fotos">
+      <div class="container">
+        <p class="section-kicker">Calentando motores</p>
+        <h2 class="section-title">¡Sube tus <em>fotos</em>!</h2>
+        <p class="section-lead">Antes de la cena, durante o después: comparte aquí tus mejores imágenes. Se guardan en este navegador.</p>
+        <div class="photo-tools">
+          <label class="dropzone" id="dropzone" for="photoInput">
+            <input type="file" id="photoInput" accept="image/*" multiple hidden>
+            <span class="dropzone-icon">📸</span>
+            <strong>Arrastra tus fotos aquí</strong>
+            <span>o haz clic para seleccionarlas</span>
+            <small>JPG, PNG o WebP · se optimizan automáticamente</small>
+          </label>
+        </div>
+        <div class="gallery" id="gallery" aria-live="polite"></div>
+        <p class="empty-state" id="galleryEmpty">Todavía no hay fotos. ¡Sé el primero!</p>
+      </div>
+    </section>
+
+    <section class="section mapa-section" id="mapa">
+      <div class="container">
+        <p class="section-kicker">Nos vemos allí</p>
+        <h2 class="section-title">Cómo <em>llegar</em></h2>
+        <div class="map-layout">
+          <div class="map-card">
+            <iframe title="Mapa del Gran Hotel Casino Extremadura" src="https://www.openstreetmap.org/export/embed.html?bbox=-6.9956605%2C38.8755672%2C-6.9716605%2C38.8915672&amp;layer=mapnik&amp;marker=38.8835672%2C-6.9836605" loading="lazy"></iframe>
+          </div>
+          <div class="map-info">
+            <span class="map-pin">📍</span>
+            <h3>Gran Hotel Casino Extremadura</h3>
+            <p>Av. Adolfo Díaz Ambrona, 11<br>06006 Badajoz (Extremadura)</p>
+            <a class="btn btn-primary" href="https://www.google.com/maps/dir/?api=1&amp;destination=Gran+Hotel+Casino+Extremadura%2C+Badajoz" target="_blank" rel="noopener">🧭 Abrir indicaciones</a>
+            <p class="map-note">Pulsa el marcador del mapa para ver el hotel. El enlace abre Google Maps con la ruta desde tu ubicación.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section muro-section" id="muro">
+      <div class="container">
+        <p class="section-kicker">Deja tu huella</p>
+        <h2 class="section-title">Muro de <em>deseos</em></h2>
+        <p class="section-lead">Escribe un deseo, un recuerdo o un mensaje para la cena. ¡Entre todos construimos este muro!</p>
+        <div class="wall-layout">
+          <form class="wish-form" id="wishForm">
+            <label for="wishName">Tu nombre</label>
+            <input type="text" id="wishName" maxlength="30" placeholder="Por ejemplo: Paco" required>
+            <label for="wishText">Tu mensaje</label>
+            <textarea id="wishText" rows="4" maxlength="240" placeholder="¡Que no falte la cena y que acabemos todos cantando!" required></textarea>
+            <div class="emoji-picks" id="emojiPicks">
+              <button type="button">🎄</button><button type="button">✨</button><button type="button">🎁</button><button type="button">🥂</button><button type="button">😄</button><button type="button">⭐</button>
+            </div>
+            <button class="btn btn-primary" type="submit">💌 Fijar en el muro</button>
+          </form>
+          <div class="wall" id="wall" aria-live="polite"></div>
+        </div>
+        <p class="empty-state" id="wallEmpty">El muro está esperando tu primer mensaje…</p>
+      </div>
+    </section>
+
+    <section class="section gincana-section" id="gincana">
+      <div class="container">
+        <p class="section-kicker">La aventura de la noche</p>
+        <h2 class="section-title">Gincana de los <em>8 QR</em></h2>
+        <p class="section-lead">Inscríbete, busca los 8 códigos QR escondidos por las instalaciones del hotel y escanea cada uno con el móvil. ¡Los tres primeros en completarla tienen premio!</p>
+
+        <div class="notebook" id="notebook">
+          <div class="notebook-ring" aria-hidden="true"></div>
+          <div class="notebook-head">
+            <div><span class="notebook-label">CUADERNO DE CAMPO</span><h3>Mi gincana</h3></div>
+            <div class="notebook-stamp">8 QR<br><small>1 NAVIDAD</small></div>
+          </div>
+
+          <form class="register-form" id="registerForm">
+            <label for="runnerName">Nombre del participante</label>
+            <div class="register-row">
+              <input type="text" id="runnerName" maxlength="24" placeholder="Escribe tu nombre para inscribirte" required>
+              <button class="btn btn-primary" type="submit">Inscribirme</button>
+            </div>
+          </form>
+
+          <div class="runner-panel" id="runnerPanel" hidden>
+            <div class="runner-line"><span>Participante:</span> <strong id="runnerNameDisplay"></strong></div>
+            <div class="runner-line"><span>Progreso:</span> <strong id="progressText">0 de 8 códigos</strong></div>
+            <div class="progress-bar"><div id="progressFill"></div></div>
+            <div class="prize-note" id="prizeNote">Completa los 8 códigos para entrar en el ranking y optar a los premios.</div>
+          </div>
+
+          <div class="qr-grid" id="qrGrid"></div>
+
+          <div class="manual-code">
+            <label for="manualInput">¿No puedes escanear? Introduce el código que veas en el cartel:</label>
+            <div class="register-row">
+              <input type="text" id="manualInput" maxlength="20" placeholder="Ej. NAVIDAD-2026-01" autocomplete="off">
+              <button class="btn btn-ghost" id="manualBtn" type="button">Validar</button>
+            </div>
+          </div>
+
+          <div class="ranking" id="ranking" hidden>
+            <h3>🏆 Ranking de la gincana</h3>
+            <div class="podium" id="podium"></div>
+            <ol class="ranking-list" id="rankingList"></ol>
+          </div>
+          <button class="reset-link" id="resetRun" type="button" hidden>Empezar de nuevo</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-title">🎄 Cena de Navidad 2026 🎄</p>
+      <p><span class="palabras-navidad">Valverde &amp; La Granadilla</span> · 5 de diciembre · Gran Hotel Casino Extremadura</p>
+      <p class="footer-small">Hecho con ilusión para la mejor noche del año.</p>
+    </div>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <button id="lightboxClose" aria-label="Cerrar foto">✕</button>
+    <img id="lightboxImg" alt="Foto ampliada">
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/vendor/qrcode.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
