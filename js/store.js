@@ -6,6 +6,7 @@
   const key = String(config.supabaseKey || '');
   const bucket = 'fotos-cena';
   const enabled = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url) && key.length > 20;
+  const status = { failures: 0 };
 
   function headers(extra) {
     return Object.assign({
@@ -23,11 +24,19 @@
   }
 
   async function request(resource, options) {
-    const response = await fetch(url + resource, options);
+    let response;
+    try {
+      response = await fetch(url + resource, options);
+    } catch (error) {
+      status.failures += 1;
+      throw error;
+    }
     if (!response.ok) {
+      status.failures += 1;
       const detail = await response.text().catch(() => '');
       throw new Error(`Supabase ${response.status}: ${detail.slice(0, 140)}`);
     }
+    status.failures = 0;
     const text = await response.text();
     return text ? JSON.parse(text) : null;
   }
@@ -108,5 +117,5 @@
     });
   }
 
-  window.CenaStore = { enabled, root: bucket, get, keys, put, remove, payload };
+  window.CenaStore = { enabled, root: bucket, get, keys, put, remove, payload, status };
 })();

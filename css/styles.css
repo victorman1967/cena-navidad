@@ -72,6 +72,8 @@ section { position: relative; z-index: 1; }
 .brand-text { font-weight: 800; letter-spacing: .5px; line-height: 1.1; font-size: 15px; }
 .brand-text small { display: block; font-weight: 500; font-size: 10px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
 .sync-badge { padding: 5px 11px; border-radius: 999px; border: 1px solid var(--border); background: rgba(243,201,105,.1); color: var(--gold-soft); font-size: 10px; font-weight: 700; letter-spacing: .4px; white-space: nowrap; }
+.sync-warning { position: fixed; top: 64px; left: 0; right: 0; z-index: 45; padding: 9px 18px; text-align: center; background: #7a1f2e; color: white; font-size: 12px; font-weight: 700; box-shadow: 0 8px 20px rgba(0,0,0,.3); }
+.sync-warning code { padding: 1px 5px; border-radius: 4px; background: rgba(0,0,0,.3); }
 .site-nav { display: flex; align-items: center; gap: clamp(10px, 1.7vw, 26px); }
 .site-nav a { font-size: 13px; font-weight: 600; color: #dce8df; transition: color .2s; white-space: nowrap; }
 .site-nav a:hover { color: var(--gold); }

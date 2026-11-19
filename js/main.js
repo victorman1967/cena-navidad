@@ -681,8 +681,13 @@
     initWall();
     initGincana();
     if (store.enabled) {
-      collections.forEach((collection) => collection.poll());
-      setInterval(() => collections.forEach((collection) => collection.poll()), 4000);
+      const refresh = () => {
+        collections.forEach((collection) => collection.poll());
+        const warning = $('#syncWarning');
+        if (warning) warning.hidden = store.status.failures < 3;
+      };
+      refresh();
+      setInterval(refresh, 4000);
     }
   });
 })();
