@@ -83,7 +83,7 @@
     }
     return {
       src: `${url}/storage/v1/object/public/${bucket}/${objectPath}`,
-      storagePath: objectPath
+      storage_path: objectPath
     };
   }
 
@@ -91,8 +91,12 @@
     const { table, id } = splitPath(path);
     let row = payload(value);
     if (table === 'photos' && id && typeof row.src === 'string' && row.src.indexOf('data:') === 0) {
-      const uploaded = await uploadPhoto(id, row.src);
-      if (uploaded) row = Object.assign({}, row, uploaded);
+      try {
+        const uploaded = await uploadPhoto(id, row.src);
+        if (uploaded) row = Object.assign({}, row, uploaded);
+      } catch (error) {
+        row = Object.assign({}, row, { storage_path: '' });
+      }
     }
     await request(`/rest/v1/${table}`, {
       method: 'POST',

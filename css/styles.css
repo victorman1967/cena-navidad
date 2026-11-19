@@ -208,6 +208,9 @@ section { position: relative; z-index: 1; }
 .dropzone strong { color: var(--gold); font-size: 17px; }
 .dropzone span:not(.dropzone-icon) { font-size: 13px; color: #cbdacf; }
 .dropzone small { font-size: 10px; color: #8fa698; }
+.gallery-heading { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 40px 0 18px; }
+.gallery-heading h3 { margin: 0; font-family: 'Great Vibes', cursive; font-size: 32px; font-weight: 400; color: var(--gold); }
+.count-badge { padding: 4px 11px; border-radius: 999px; border: 1px solid var(--border); background: rgba(243,201,105,.1); color: var(--gold-soft); font-size: 10px; font-weight: 800; letter-spacing: 1px; }
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
 .photo-card { position: relative; aspect-ratio: 4 / 3; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: #112; animation: pop .35s ease both; }
 @keyframes pop { from { opacity: 0; transform: scale(.9) translateY(10px); } }

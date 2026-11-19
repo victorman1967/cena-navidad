@@ -235,6 +235,7 @@
     function render(items) {
       gallery.innerHTML = '';
       empty.hidden = items.length > 0;
+      $('#photoCount').textContent = `${items.length} ${items.length === 1 ? 'foto' : 'fotos'}`;
       items.forEach((photo) => {
         const card = document.createElement('figure');
         card.className = 'photo-card';
