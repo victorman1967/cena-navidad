@@ -55,6 +55,25 @@
     return result;
   }
 
+  function publicUrl(objectPath) {
+    return `${url}/storage/v1/object/public/${bucket}/${objectPath}`;
+  }
+
+  async function listPhotos() {
+    try {
+      const response = await fetch(`${url}/storage/v1/object/list/${bucket}`, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify({ prefix: '', limit: 100, sortBy: { column: 'name', order: 'desc' } })
+      });
+      if (!response.ok) return [];
+      const objects = await response.json();
+      return Array.isArray(objects) ? objects : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
   async function get(path) {
     const { table, id } = splitPath(path);
     if (!id) return null;
@@ -82,7 +101,7 @@
       throw new Error(`Storage ${response.status}: ${detail.slice(0, 140)}`);
     }
     return {
-      src: `${url}/storage/v1/object/public/${bucket}/${objectPath}`,
+      src: publicUrl(objectPath),
       storage_path: objectPath
     };
   }
@@ -121,5 +140,5 @@
     });
   }
 
-  window.CenaStore = { enabled, root: bucket, get, keys, put, remove, payload, status };
+  window.CenaStore = { enabled, root: bucket, get, keys, put, remove, payload, status, listPhotos, publicUrl };
 })();

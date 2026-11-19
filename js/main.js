@@ -674,7 +674,31 @@
     setInterval(updateGate, 1000);
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  async function repairPhotos() {
+    const flag = 'cena-photo-repair-v1';
+    if (readStore(flag, false)) return;
+    const objects = await store.listPhotos();
+    let remote = {};
+    try {
+      remote = await store.keys('photos');
+    } catch (error) {}
+    for (const object of objects) {
+      if (!/^.+\.jpg$/i.test(object.name)) continue;
+      const id = object.name.replace(/\.jpg$/i, '');
+      if (remote[id]) continue;
+      const date = object.created_at ? new Date(object.created_at).toLocaleDateString('es-ES') : '';
+      await store.put(`photos/${id}`, {
+        id,
+        name: 'Foto',
+        date,
+        src: store.publicUrl(object.name),
+        storage_path: object.name
+      }).catch(() => {});
+    }
+    writeStore(flag, true);
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
     initSnow();
     initHeader();
     initCountdown();
@@ -687,6 +711,7 @@
         const warning = $('#syncWarning');
         if (warning) warning.hidden = store.status.failures < 3;
       };
+      await repairPhotos();
       refresh();
       setInterval(refresh, 4000);
     }
