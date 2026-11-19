@@ -27,7 +27,7 @@
     <nav class="site-nav" id="siteNav" aria-label="Navegación principal">
       <a href="#inicio">Inicio</a>
       <a href="#organizadores">Organizadores</a>
-      <a href="#fotos">Calentando motores</a>
+      <a href="#fotos">Galería 📸</a>
       <a href="#mapa">Cómo llegar</a>
       <a href="#muro">Muro de deseos</a>
       <a href="#gincana" class="nav-cta">Gincana 🎁</a>
@@ -153,7 +153,7 @@
 
     <section class="section fotos-section" id="fotos">
       <div class="container">
-        <p class="section-kicker">Calentando motores</p>
+        <p class="section-kicker">Calentando motores <span class="live-badge" id="liveFotos" hidden></span></p>
         <h2 class="section-title">¡Sube tus <em>fotos</em>!</h2>
         <p class="section-lead">Antes de la cena, durante o después: comparte aquí tus mejores imágenes. Se guardan automáticamente y aparecen en la galería de todos.</p>
         <div class="photo-tools">
@@ -191,7 +191,7 @@
 
     <section class="section muro-section" id="muro">
       <div class="container">
-        <p class="section-kicker">Deja tu huella</p>
+        <p class="section-kicker">Deja tu huella <span class="live-badge" id="liveMuro" hidden></span></p>
         <h2 class="section-title">Muro de <em>deseos</em></h2>
         <p class="section-lead">Escribe un deseo, un recuerdo o un mensaje para la cena. ¡Entre todos construimos este muro!</p>
         <div class="wall-layout">
@@ -213,7 +213,7 @@
 
     <section class="section gincana-section" id="gincana">
       <div class="container">
-        <p class="section-kicker">La aventura de la noche</p>
+        <p class="section-kicker">La aventura de la noche <span class="live-badge" id="liveRanking" hidden></span></p>
         <h2 class="section-title">Gincana de los <em>8 QR</em></h2>
         <p class="section-lead">Inscríbete, busca los 8 códigos QR escondidos por las instalaciones del hotel y escanea cada uno con el móvil. ¡Los tres primeros en completarla tienen premio!</p>
 
@@ -222,6 +222,12 @@
           <div class="notebook-head">
             <div><span class="notebook-label">CUADERNO DE CAMPO</span><h3>Mi gincana</h3></div>
             <div class="notebook-stamp">8 QR<br><small>1 NAVIDAD</small></div>
+          </div>
+
+          <div class="gincana-locked" id="gincanaLocked">
+            <span class="lock-icon">🔒</span>
+            <strong>La gincana empieza a las 23:30 h</strong>
+            <p id="gincanaLockedText">Nos vemos en la cena.</p>
           </div>
 
           <form class="register-form" id="registerForm">
@@ -251,7 +257,7 @@
 
           <div class="ranking" id="ranking" hidden>
             <h3>🏆 Top 10 de la gincana</h3>
-            <p class="ranking-note">Aquí quedan guardados los nombres de las 10 primeras personas que completen los 8 QR.</p>
+            <p class="ranking-note">Ranking público en directo: aquí quedan guardados los nombres de las 10 primeras personas que completen los 8 QR.</p>
             <div class="podium" id="podium"></div>
             <ol class="ranking-list" id="rankingList"></ol>
           </div>

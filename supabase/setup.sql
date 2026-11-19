@@ -32,6 +32,12 @@ create table if not exists public.finishers (
   created_at timestamptz not null default now()
 );
 
+grant usage on schema public to anon, authenticated;
+grant select, insert, update, delete on public.wishes to anon, authenticated;
+grant select, insert, update, delete on public.photos to anon, authenticated;
+grant select, insert, update, delete on public.runners to anon, authenticated;
+grant select, insert, update, delete on public.finishers to anon, authenticated;
+
 alter table public.wishes enable row level security;
 alter table public.photos enable row level security;
 alter table public.runners enable row level security;

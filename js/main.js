@@ -5,6 +5,7 @@
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   const store = window.CenaStore;
   const collections = [];
+  const GINCANA_START = new Date('2026-12-05T23:30:00+01:00').getTime();
 
   const toastEl = $('#toast');
   let toastTimer;
@@ -176,10 +177,18 @@
         ? 'Fotos, mensajes y ranking se comparten entre todos los invitados'
         : 'Configura js/config.js para compartir los datos entre todos los invitados';
     }
+    if (store.enabled) {
+      ['#liveFotos', '#liveMuro', '#liveRanking'].forEach((selector) => {
+        const live = $(selector);
+        if (!live) return;
+        live.hidden = false;
+        live.textContent = 'EN DIRECTO';
+      });
+    }
   }
 
   function initCountdown() {
-    const target = new Date('2026-12-05T23:00:00').getTime();
+    const target = new Date('2026-12-05T23:00:00+01:00').getTime();
     const fields = {
       days: $('#cdDays'), hours: $('#cdHours'), minutes: $('#cdMinutes'), seconds: $('#cdSeconds')
     };
@@ -405,8 +414,28 @@
     const form = $('#registerForm');
     const ranking = $('#ranking');
     const resetBtn = $('#resetRun');
+    const lockedPanel = $('#gincanaLocked');
+    const lockedText = $('#gincanaLockedText');
 
     const currentRunner = () => state.runners.find((runner) => runner.id === myId) || null;
+    const isLocked = () => Date.now() < GINCANA_START;
+
+    function updateGate() {
+      const locked = isLocked();
+      lockedPanel.hidden = !locked;
+      if (locked) {
+        const remaining = GINCANA_START - Date.now();
+        const hours = Math.floor(remaining / 3600000);
+        const minutes = Math.floor((remaining % 3600000) / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        lockedText.textContent = `Faltan ${hours} h ${minutes} min ${seconds} s para empezar. ¡Prepara el móvil!`;
+      }
+      $('#runnerName').disabled = locked;
+      $('button', form).disabled = locked;
+      $('#manualInput').disabled = locked;
+      $('#manualBtn').disabled = locked;
+      resetBtn.disabled = locked;
+    }
 
     function save() {
       writeStore(RACE_KEY, state);
@@ -481,8 +510,7 @@
 
     function renderRanking(items) {
       const completed = items.slice().sort((a, b) => a.end - b.end);
-      ranking.hidden = completed.length === 0;
-      if (ranking.hidden) return;
+      ranking.hidden = false;
 
       const podium = $('#podium');
       podium.innerHTML = '';
@@ -507,6 +535,12 @@
 
       const list = $('#rankingList');
       list.innerHTML = '';
+      if (!completed.length) {
+        const empty = document.createElement('li');
+        empty.className = 'ranking-empty';
+        empty.textContent = 'Todavía no hay finalistas. ¡El primer nombre aparecerá aquí!';
+        list.appendChild(empty);
+      }
       completed.slice(0, 10).forEach((runner, index) => {
         const item = document.createElement('li');
         const name = document.createElement('strong');
@@ -519,9 +553,12 @@
 
     function render() {
       const runner = currentRunner();
-      form.hidden = Boolean(runner);
+      const locked = isLocked();
+      form.hidden = Boolean(runner) || locked;
+      $('.manual-code').hidden = locked;
       panel.hidden = !runner;
-      resetBtn.hidden = !runner;
+      resetBtn.hidden = !runner || locked;
+      updateGate();
       buildCards();
       if (runner) {
         $('#runnerNameDisplay').textContent = runner.name;
@@ -535,6 +572,10 @@
     }
 
     function markCode(rawCode) {
+      if (isLocked()) {
+        showToast('La gincana empieza a las 23:30 h del 5 de diciembre 🔒');
+        return false;
+      }
       const code = String(rawCode || '').trim().toUpperCase();
       const item = codes.find((entry) => entry.code === code || entry.id === code);
       if (!item) {
@@ -572,6 +613,10 @@
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
+      if (isLocked()) {
+        showToast('La gincana empieza a las 23:30 h del 5 de diciembre 🔒');
+        return;
+      }
       const name = $('#runnerName').value.trim();
       if (!name) return;
       const runner = {
@@ -616,7 +661,8 @@
     function handleIncomingCode() {
       const incoming = codeFromLocation();
       if (!incoming) return;
-      if (currentRunner()) markCode(incoming);
+      if (isLocked()) showToast('Escaneaste un QR, pero la gincana empieza a las 23:30 h 🔒');
+      else if (currentRunner()) markCode(incoming);
       else showToast('Has escaneado un QR: inscríbete para registrar tu código.');
       clearCodeFromLocation();
     }
@@ -624,6 +670,7 @@
     window.addEventListener('hashchange', handleIncomingCode);
     handleIncomingCode();
     render();
+    setInterval(updateGate, 1000);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
