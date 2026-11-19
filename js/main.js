@@ -405,7 +405,7 @@
       { id: 'QR-07', code: 'NAVIDAD-2026-07', name: 'El gimnasio', clue: 'Junto a las máquinas' },
       { id: 'QR-08', code: 'JEFE-2026-08', name: 'Busca a tu jefe', clue: 'Pregunta por el mando de la organización' }
     ];
-    const prizes = ['Cesta navideña de productos extremeños', 'Botella especial y copas grabadas', 'Tarjeta regalo sorpresa'];
+    const prizes = ['Súper premio por decidir', 'Súper premio por decidir', 'Súper premio por decidir'];
     const finishers = createCollection('finalistas', 'finishers');
     let state = readStore(RACE_KEY, { runners: [] });
     if (!Array.isArray(state.runners)) state = { runners: [] };
