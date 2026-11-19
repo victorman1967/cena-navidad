@@ -3,6 +3,8 @@
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  const store = window.CenaStore;
+  const collections = [];
 
   const toastEl = $('#toast');
   let toastTimer;
@@ -30,6 +32,106 @@
       showToast('No se pudo guardar: memoria del navegador llena.');
       return false;
     }
+  }
+
+  function createCollection(name, path, options) {
+    const settings = options || {};
+    const storageKey = `cena-${name}-v1`;
+    let items = readStore(storageKey, []);
+    if (!Array.isArray(items)) items = [];
+    const listeners = [];
+
+    function persist() {
+      const snapshot = items.map((item) => {
+        if (store.enabled && item.synced && settings.memoryOnly) {
+          const copy = Object.assign({}, item);
+          settings.memoryOnly.forEach((field) => { delete copy[field]; });
+          return copy;
+        }
+        return item;
+      });
+      writeStore(storageKey, snapshot);
+    }
+
+    function all() { return items.slice(); }
+    function subscribe(fn) { listeners.push(fn); fn(items); }
+    function notify() { listeners.forEach((fn) => fn(items)); }
+
+    function add(item) {
+      item.synced = false;
+      items.push(item);
+      persist();
+      notify();
+      flush();
+    }
+
+    function remove(id) {
+      const before = items.length;
+      items = items.filter((item) => item.id !== id);
+      if (items.length === before) return;
+      persist();
+      notify();
+      if (store.enabled) store.remove(`${path}/${id}`).catch(() => {});
+    }
+
+    async function flush() {
+      if (!store.enabled) {
+        let changed = false;
+        items.forEach((item) => {
+          if (!item.synced) { item.synced = true; changed = true; }
+        });
+        if (changed) { persist(); notify(); }
+        return;
+      }
+      for (const item of items.slice()) {
+        if (item.synced) continue;
+        try {
+          await store.put(`${path}/${item.id}`, store.payload(item));
+          item.synced = true;
+          persist();
+          notify();
+        } catch (error) {
+          return;
+        }
+      }
+    }
+
+    async function poll() {
+      if (!store.enabled) return;
+      let remote;
+      try {
+        remote = await store.keys(path);
+      } catch (error) {
+        return;
+      }
+      const remoteIds = remote && typeof remote === 'object' ? Object.keys(remote) : [];
+      let changed = false;
+
+      for (const id of remoteIds) {
+        const index = items.findIndex((item) => item.id === id);
+        const local = index >= 0 ? items[index] : null;
+        const complete = !settings.memoryOnly || settings.memoryOnly.every((field) => local && local[field] != null);
+        if (local && local.synced && complete) continue;
+        try {
+          const item = await store.get(`${path}/${id}`);
+          if (!item || !item.id) continue;
+          item.synced = true;
+          if (local) items[index] = item; else items.push(item);
+          changed = true;
+        } catch (error) {}
+      }
+
+      const stale = items.filter((item) => item.synced && remoteIds.indexOf(item.id) === -1);
+      if (stale.length) {
+        items = items.filter((item) => stale.indexOf(item) === -1);
+        changed = true;
+      }
+      if (changed) { persist(); notify(); }
+    }
+
+    const api = { all, subscribe, add, remove, flush, poll };
+    collections.push(api);
+    return api;
   }
 
   function initSnow() {
@@ -65,6 +167,15 @@
       nav.classList.remove('open');
       toggle.setAttribute('aria-expanded', 'false');
     }));
+
+    const badge = $('#syncBadge');
+    if (badge) {
+      badge.hidden = false;
+      badge.textContent = store.enabled ? '☁️ Datos compartidos' : '📱 Solo este navegador';
+      badge.title = store.enabled
+        ? 'Fotos, mensajes y ranking se comparten entre todos los invitados'
+        : 'Configura js/config.js para compartir los datos entre todos los invitados';
+    }
   }
 
   function initCountdown() {
@@ -74,7 +185,6 @@
     };
     const boxes = $$('#countdown .time-box');
     const label = $('#countdownLabel');
-    let previous = null;
 
     function paint() {
       const remaining = Math.max(0, target - Date.now());
@@ -101,38 +211,44 @@
       } else if (next.days === 0) {
         label.textContent = '¡Hoy es el gran día! Nos vemos a las 23:00 h 🥂';
       }
-      previous = next;
     }
     paint();
     setInterval(paint, 1000);
   }
 
   function initGallery() {
-    const PHOTOS_KEY = 'cena-fotos-v1';
     const input = $('#photoInput');
     const dropzone = $('#dropzone');
     const gallery = $('#gallery');
     const empty = $('#galleryEmpty');
-    let photos = readStore(PHOTOS_KEY, []);
+    const photos = createCollection('fotos', 'photos', { memoryOnly: ['src'] });
 
-    function render() {
+    function render(items) {
       gallery.innerHTML = '';
-      empty.hidden = photos.length > 0;
-      photos.forEach((photo) => {
+      empty.hidden = items.length > 0;
+      items.forEach((photo) => {
         const card = document.createElement('figure');
         card.className = 'photo-card';
-        card.innerHTML = `<img src="${photo.src}" alt="${photo.name}"><button type="button" title="Eliminar foto">✕</button><figcaption>${photo.name} · ${photo.date}</figcaption>`;
-        $('img', card).addEventListener('click', () => {
+        const img = document.createElement('img');
+        if (photo.src) img.src = photo.src;
+        img.alt = photo.name || 'Foto de la cena';
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.title = 'Eliminar foto';
+        button.textContent = '✕';
+        const caption = document.createElement('figcaption');
+        caption.textContent = `${photo.name || 'Foto'} · ${photo.date || ''}`;
+        img.addEventListener('click', () => {
+          if (!photo.src) return;
           $('#lightboxImg').src = photo.src;
           $('#lightbox').hidden = false;
         });
-        $('button', card).addEventListener('click', () => {
-          photos = photos.filter((item) => item.id !== photo.id);
-          if (writeStore(PHOTOS_KEY, photos)) render();
-        });
+        button.addEventListener('click', () => photos.remove(photo.id));
+        card.append(img, button, caption);
         gallery.appendChild(card);
       });
     }
+    photos.subscribe(render);
 
     function compress(file) {
       return new Promise((resolve, reject) => {
@@ -159,15 +275,16 @@
     async function addFiles(files) {
       const images = Array.from(files).filter((file) => file.type.startsWith('image/'));
       if (!images.length) return;
-      if (photos.length + images.length > 30) {
-        showToast('Máximo 30 fotos en este navegador.');
+      const current = photos.all();
+      if (current.length + images.length > 30) {
+        showToast('Máximo 30 fotos en la galería.');
         return;
       }
       showToast('Añadiendo fotos… 📸');
       for (const file of images) {
         try {
           const src = await compress(file);
-          photos.push({
+          photos.add({
             id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
             src,
             name: file.name.slice(0, 34),
@@ -177,8 +294,6 @@
           showToast('Una imagen no se pudo añadir.');
         }
       }
-      writeStore(PHOTOS_KEY, photos);
-      render();
       showToast('¡Fotos añadidas! Ya están en la galería.');
     }
 
@@ -208,34 +323,42 @@
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && !lightbox.hidden) closeLightbox();
     });
-    render();
   }
 
   function initWall() {
-    const WISHES_KEY = 'cena-deseos-v1';
     const form = $('#wishForm');
     const wall = $('#wall');
     const empty = $('#wallEmpty');
     const colors = ['#ffe6a7', '#ffd9de', '#d8f4e2', '#dcecff', '#f2e1ff', '#ffecd2'];
-    let wishes = readStore(WISHES_KEY, []);
+    const wishes = createCollection('deseos', 'wishes');
 
-    function render() {
+    function render(items) {
       wall.innerHTML = '';
-      empty.hidden = wishes.length > 0;
-      wishes.slice().reverse().forEach((wish) => {
+      empty.hidden = items.length > 0;
+      items.slice().reverse().forEach((wish) => {
         const note = document.createElement('article');
         note.className = 'wish';
         note.style.background = colors[Math.floor(Math.random() * colors.length)];
         note.style.setProperty('--rot', `${-2 + Math.random() * 4}deg`);
-        note.innerHTML = `<div class="wish-head"><strong>${wish.name}</strong><time>${wish.date}</time></div><p>${wish.text}</p><button type="button" title="Borrar mensaje">Borrar</button>`;
-        $('button', note).addEventListener('click', () => {
-          wishes = wishes.filter((item) => item.id !== wish.id);
-          writeStore(WISHES_KEY, wishes);
-          render();
-        });
+        const head = document.createElement('div');
+        head.className = 'wish-head';
+        const name = document.createElement('strong');
+        name.textContent = wish.name || 'Invitado';
+        const date = document.createElement('time');
+        date.textContent = wish.date || '';
+        head.append(name, date);
+        const text = document.createElement('p');
+        text.textContent = wish.text || '';
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.title = 'Borrar mensaje';
+        button.textContent = 'Borrar';
+        button.addEventListener('click', () => wishes.remove(wish.id));
+        note.append(head, text, button);
         wall.appendChild(note);
       });
     }
+    wishes.subscribe(render);
 
     $$('#emojiPicks button').forEach((button) => button.addEventListener('click', () => {
       const textarea = $('#wishText');
@@ -248,25 +371,15 @@
       const name = $('#wishName').value.trim();
       const text = $('#wishText').value.trim();
       if (!name || !text) return;
-      wishes.push({
+      wishes.add({
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        name: escapeHtml(name),
-        text: escapeHtml(text),
+        name: name.slice(0, 30),
+        text: text.slice(0, 240),
         date: new Date().toLocaleDateString('es-ES')
       });
-      if (writeStore(WISHES_KEY, wishes)) {
-        form.reset();
-        render();
-        showToast('¡Tu deseo ya está en el muro! ✨');
-      }
+      form.reset();
+      showToast('¡Tu deseo ya está en el muro! ✨');
     });
-    render();
-  }
-
-  function escapeHtml(value) {
-    return String(value).replace(/[&<>"']/g, (char) => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    })[char]);
   }
 
   function initGincana() {
@@ -283,6 +396,7 @@
       { id: 'QR-08', code: 'JEFE-2026-08', name: 'Busca a tu jefe', clue: 'Pregunta por el mando de la organización' }
     ];
     const prizes = ['Cesta navideña de productos extremeños', 'Botella especial y copas grabadas', 'Tarjeta regalo sorpresa'];
+    const finishers = createCollection('finalistas', 'finishers');
     let state = readStore(RACE_KEY, { runners: [] });
     if (!Array.isArray(state.runners)) state = { runners: [] };
     let myId = readStore(ME_KEY, null);
@@ -296,6 +410,8 @@
 
     function save() {
       writeStore(RACE_KEY, state);
+      const runner = currentRunner();
+      if (runner && store.enabled) store.put(`runners/${runner.id}`, store.payload(runner)).catch(() => {});
     }
 
     function codeFromLocation() {
@@ -330,11 +446,18 @@
       const runner = currentRunner();
       codes.forEach((item, index) => {
         const card = document.createElement('article');
-        card.className = `qr-card${runner && runner.codes.includes(item.id) ? ' done' : ''}`;
+        const done = runner && runner.codes.includes(item.id);
+        card.className = `qr-card${done ? ' done' : ''}`;
         card.dataset.num = String(index + 1).padStart(2, '0');
         card.dataset.code = item.code;
-        card.innerHTML = `<div class="qr-canvas"></div><h4>${item.name}</h4><p>${item.clue}</p>`;
-        const holder = $('.qr-canvas', card);
+        const holder = document.createElement('div');
+        holder.className = 'qr-canvas';
+        card.appendChild(holder);
+        const title = document.createElement('h4');
+        title.textContent = item.name;
+        const clue = document.createElement('p');
+        clue.textContent = item.clue;
+        card.append(title, clue);
         if (typeof QRCode === 'function') {
           new QRCode(holder, {
             text: qrUrl(item.code),
@@ -356,31 +479,43 @@
       });
     }
 
-    function renderRanking() {
-      const completed = state.runners.filter((runner) => runner.end)
-        .sort((a, b) => a.end - b.end);
-      if (!currentRunner() || !currentRunner().end) {
-        ranking.hidden = true;
-        return;
-      }
-      ranking.hidden = false;
+    function renderRanking(items) {
+      const completed = items.slice().sort((a, b) => a.end - b.end);
+      ranking.hidden = completed.length === 0;
+      if (ranking.hidden) return;
+
       const podium = $('#podium');
       podium.innerHTML = '';
       [0, 1, 2].forEach((index) => {
         const runner = completed[index];
         const step = document.createElement('div');
         step.className = 'podium-step';
-        step.innerHTML = `<span class="medal">${['🥇', '🥈', '🥉'][index]}</span><span class="pname">${runner ? escapeHtml(runner.name) : 'Por decidir'}</span><span class="ptime">${runner ? formatTime(runner.end - runner.start) : '--:--'}</span><small>${prizes[index]}</small>`;
+        const medal = document.createElement('span');
+        medal.className = 'medal';
+        medal.textContent = ['🥇', '🥈', '🥉'][index];
+        const name = document.createElement('span');
+        name.className = 'pname';
+        name.textContent = runner ? runner.name : 'Por decidir';
+        const time = document.createElement('span');
+        time.className = 'ptime';
+        time.textContent = runner ? formatTime(runner.end - runner.start) : '--:--';
+        const prize = document.createElement('small');
+        prize.textContent = prizes[index];
+        step.append(medal, name, time, prize);
         podium.appendChild(step);
       });
+
       const list = $('#rankingList');
       list.innerHTML = '';
-      completed.forEach((runner) => {
+      completed.slice(0, 10).forEach((runner, index) => {
         const item = document.createElement('li');
-        item.innerHTML = `<strong>${escapeHtml(runner.name)}</strong> · ${formatTime(runner.end - runner.start)}`;
+        const name = document.createElement('strong');
+        name.textContent = `${index + 1}. ${runner.name}`;
+        item.append(name, document.createTextNode(` · ${formatTime(runner.end - runner.start)}`));
         list.appendChild(item);
       });
     }
+    finishers.subscribe(renderRanking);
 
     function render() {
       const runner = currentRunner();
@@ -392,11 +527,11 @@
         $('#runnerNameDisplay').textContent = runner.name;
         $('#progressText').textContent = `${runner.codes.length} de ${codes.length} códigos`;
         $('#progressFill').style.width = `${(runner.codes.length / codes.length) * 100}%`;
+        const position = finishers.all().filter((item) => item.end <= runner.end).length;
         $('#prizeNote').textContent = runner.end
-          ? `¡Completado en ${formatTime(runner.end - runner.start)}! Eres ${state.runners.filter((r) => r.end && r.end <= runner.end).length}º. Los tres primeros tienen premio.`
+          ? `¡Completado en ${formatTime(runner.end - runner.start)}! Eres ${position}º. Quedan guardados los 10 primeros.`
           : 'Completa los 8 códigos para entrar en el ranking y optar a los premios.';
       }
-      renderRanking();
     }
 
     function markCode(rawCode) {
@@ -420,7 +555,15 @@
         return false;
       }
       runner.codes.push(item.id);
-      if (runner.codes.length === codes.length) runner.end = Date.now();
+      if (runner.codes.length === codes.length) {
+        runner.end = Date.now();
+        finishers.add({
+          id: runner.id,
+          name: runner.name,
+          start: runner.start,
+          end: runner.end
+        });
+      }
       save();
       render();
       showToast(runner.end ? '¡Los 8 QR completados! Mira el ranking 🏆' : `¡Código ${item.id} conseguido! Van ${runner.codes.length}/8`);
@@ -433,7 +576,7 @@
       if (!name) return;
       const runner = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        name: escapeHtml(name).slice(0, 24),
+        name: name.slice(0, 24),
         start: Date.now(),
         end: null,
         codes: []
@@ -460,10 +603,12 @@
     });
     resetBtn.addEventListener('click', () => {
       if (!window.confirm('¿Quieres borrar tu participación y empezar de nuevo?')) return;
+      const previous = currentRunner();
       state.runners = state.runners.filter((runner) => runner.id !== myId);
       myId = null;
       save();
-      try { localStorage.removeItem(ME_KEY); } catch (error) {}
+      writeStore(ME_KEY, null);
+      if (previous && store.enabled) store.remove(`runners/${previous.id}`).catch(() => {});
       render();
       showToast('Participación reiniciada.');
     });
@@ -488,5 +633,9 @@
     initGallery();
     initWall();
     initGincana();
+    if (store.enabled) {
+      collections.forEach((collection) => collection.poll());
+      setInterval(() => collections.forEach((collection) => collection.poll()), 4000);
+    }
   });
 })();

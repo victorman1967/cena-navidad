@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0b1f1a">
+  <link rel="icon" href="data:,">
   <meta name="description" content="Cena de Navidad 2026 - Valverde y La Granadilla. Cuenta atrás, gincana, muro de deseos y mucho más.">
   <title>Cena de Navidad 2026 · Valverde &amp; La Granadilla</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,6 +20,7 @@
       <span class="brand-icon">🎄</span>
       <span class="brand-text">Cena de Navidad<small class="palabras-navidad">Valverde &amp; La Granadilla</small></span>
     </a>
+    <span class="sync-badge" id="syncBadge" hidden></span>
     <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
@@ -153,7 +155,7 @@
       <div class="container">
         <p class="section-kicker">Calentando motores</p>
         <h2 class="section-title">¡Sube tus <em>fotos</em>!</h2>
-        <p class="section-lead">Antes de la cena, durante o después: comparte aquí tus mejores imágenes. Se guardan en este navegador.</p>
+        <p class="section-lead">Antes de la cena, durante o después: comparte aquí tus mejores imágenes. Se guardan automáticamente y aparecen en la galería de todos.</p>
         <div class="photo-tools">
           <label class="dropzone" id="dropzone" for="photoInput">
             <input type="file" id="photoInput" accept="image/*" multiple hidden>
@@ -248,7 +250,8 @@
           </div>
 
           <div class="ranking" id="ranking" hidden>
-            <h3>🏆 Ranking de la gincana</h3>
+            <h3>🏆 Top 10 de la gincana</h3>
+            <p class="ranking-note">Aquí quedan guardados los nombres de las 10 primeras personas que completen los 8 QR.</p>
             <div class="podium" id="podium"></div>
             <ol class="ranking-list" id="rankingList"></ol>
           </div>
@@ -273,6 +276,8 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="js/vendor/qrcode.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
